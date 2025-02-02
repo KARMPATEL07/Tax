@@ -149,4 +149,4 @@ def highlight_slabs(row):
         return [''] * len(row)
 
 styled_df = slab_df.style.apply(highlight_slabs, axis=1)
-st.dataframe(styled_df, use_container_width=True, hide_index=True)
+st.dataframe(styled_df, use_container_width=True, hide_index=True) 
