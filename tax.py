@@ -2,7 +2,7 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-# Set page configuration
+# Page Configuration
 st.set_page_config(
     page_title="Income Tax Calculator", page_icon="💰", layout="centered"
 )
@@ -11,35 +11,30 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        body { background-color: #f4f4f4; }
-        .stButton > button { background-color: #D7AB6CFF; color: white; font-size: 16px; }
+        body { background-color: #f9f9f9; }
+        .stButton>button { background-color: #4CAF50; color: white; font-size: 16px; border-radius: 8px; }
         .stMetric { text-align: center; }
-        .dataframe td { text-align: center; }
-        .dataframe th { text-align: center; }
+        .stRadio label { font-size: 16px; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Title with styled header
+# Title
 st.markdown(
-    """
-    <h1 style='text-align: center; color: #4CAF50;'>Income Tax Calculator (New Regime)</h1>
-    """,
+    """<h1 style='text-align: center; color: #4CAF50;'>💰 Income Tax Calculator</h1>""",
     unsafe_allow_html=True,
 )
 
-# User Input for Income
-st.markdown("### Enter Your Income")
+# User Input
+st.subheader("Enter Your Income")
 income = st.number_input(
     "Income (₹)", min_value=0, value=2500000, step=100000, format="%d"
 )
 
 # Category Selection
-st.markdown("### Select Your Category")
-category = st.radio("Category", ["Salaried", "Others"], horizontal=True)
-
-# Exemption based on category
+st.subheader("Select Your Category")
+category = st.radio("", ["Salaried", "Others"], horizontal=True)
 exemption = 1275000 if category == "Salaried" else 1200000
 
 
@@ -48,25 +43,25 @@ def calculate_tax(income, exemption):
     if income <= exemption:
         return 0
 
-    diff = income - exemption
-    tax = 0
+    slabs = [
+        (400000, 0.05),
+        (800000, 0.10),
+        (1200000, 0.15),
+        (1600000, 0.20),
+        (2000000, 0.25),
+        (2400000, 0.30),
+    ]
+    taxable_income = income - exemption
+    tax, prev_limit = 0, exemption
 
-    if income <= 400000:
-        return 0
-    elif income <= 800000:
-        tax = (income - 400000) * 5 / 100
-    elif income <= 1200000:
-        tax = (income - 800000) * 10 / 100 + 20000
-    elif income <= 1600000:
-        tax = (income - 1200000) * 15 / 100 + 60000
-    elif income <= 2000000:
-        tax = (income - 1600000) * 20 / 100 + 100000
-    elif income <= 2400000:
-        tax = (income - 2000000) * 25 / 100 + 140000
-    else:
-        tax = (income - 2400000) * 30 / 100 + 180000
+    for limit, rate in slabs:
+        if income > limit:
+            tax += (min(income, limit) - prev_limit) * rate
+            prev_limit = limit
+    if income > 2400000:
+        tax += (income - 2400000) * 0.30
 
-    return min(tax, diff)
+    return tax
 
 
 # Compute tax and results
@@ -75,7 +70,7 @@ disposable_income = income - tax
 effective_tax_rate = (tax / income) * 100 if income > 0 else 0
 
 # Display Results
-st.markdown("### Tax Summary")
+st.subheader("Tax Summary")
 col1, col2, col3 = st.columns(3)
 col1.metric("💵 Total Tax", f"₹{tax:,.0f}")
 col2.metric("🏦 Disposable Income", f"₹{disposable_income:,.0f}")
@@ -94,23 +89,23 @@ fig = px.pie(
     color_discrete_sequence=["#FF5733", "#4CAF50"],
     hole=0.4,
 )
-st.plotly_chart(fig)
+st.plotly_chart(fig, use_container_width=True)
 
 # Additional Insights
-st.markdown("### Additional Insights")
+st.subheader("💡 Additional Insights")
 st.markdown(
-    f"- 💡 Your effective tax rate is **{effective_tax_rate:.2f}%** of your total income.\n"
-    "- 📈 Higher income results in higher tax slabs; consider tax planning strategies.\n"
-    "- 🏠 Investing in tax-saving options like NPS, PPF, and ELSS can help reduce taxable income.\n"
+    f"- Your effective tax rate is **{effective_tax_rate:.2f}%** of your total income."
+)
+st.markdown("- Consider tax-saving investments like NPS, PPF, and ELSS.")
+st.markdown("- Higher income moves you into higher tax brackets; plan accordingly.")
+
+# Tax Saving Suggestion
+max_tax_saving = min(150000, income * 0.3)
+st.success(
+    f"🎯 Investing ₹1,50,000 in tax-saving instruments could save up to ₹{max_tax_saving:,.0f} in taxes!"
 )
 
-# Tax Saving Insight
-max_tax_saving = min(150000, income * 0.3)  # Maximum tax saving considering 30% bracket
-st.markdown(
-    f"- 🎯 If you invest **₹1,50,000** in NPS/ELSS, you can save up to **₹{max_tax_saving:,.0f}** in taxes!"
-)
-
-# Tax Slabs Table at the Bottom
+# Tax Slabs Table
 st.markdown("### Applicable Tax Slabs")
     
     # Define slab ranges and rates
@@ -150,7 +145,7 @@ slab_df = pd.DataFrame({
     # Apply highlighting
 def highlight_slabs(row):
         if row.name in applicable_indices:
-            return ['background-color: #EC1313FF' for _ in row]
+            return ['background-color: #2863B0FF' for _ in row]
         return [''] * len(row)
 
 styled_df = slab_df.style.apply(highlight_slabs, axis=1)
