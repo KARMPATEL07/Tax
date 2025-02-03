@@ -91,7 +91,7 @@ def format_currency(amount):
 
 def calculate_tax_breakdown(income, category):
     """Calculate tax breakdown with updated slabs and exemptions"""
-    # Set basic exemption based on category
+    # Set basic Rebate based on category
     basic_exemption = 1275000 if category == "Salaried" else 1200000
 
     # Define tax slabs
@@ -105,7 +105,7 @@ def calculate_tax_breakdown(income, category):
         (2400000, float("inf"), 0.30),
     ]
 
-    # If income is below exemption limit, return 0 tax
+    # If income is below Rebate limit, return 0 tax
     if income <= basic_exemption:
         return 0, []
 
@@ -170,14 +170,14 @@ with col1:
         "Employment Category",
         ["Salaried", "Others"],
         horizontal=True,
-        help="Salaried individuals get tax exemption up to ₹12.75 Lakhs",
+        help="Salaried individuals get tax Rebate up to ₹12.75 Lakhs",
     )
 
     exemption_limit = "₹12.75 Lakhs" if category == "Salaried" else "₹12 Lakhs"
     st.markdown(
         f"""
         <div style='background-color: #363636; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem;'>
-            <p style='margin: 0;'>✨ Tax Exempted up to {exemption_limit}</p>
+            <p style='margin: 0;'>✨ Tax Rebate up to {exemption_limit}</p>
             <p style='margin: 5px 0 0 0; font-size: 0.9em; color: #888;'>New Tax Regime benefit for FY 2025-26</p>
         </div>
         """,
@@ -226,8 +226,8 @@ st.markdown(
     """
 - New Tax Regime Benefits for FY 2025-26:
   - Income up to ₹12 Lakhs is completely tax-free for all taxpayers
-  - Salaried individuals get exemption up to ₹12.75 Lakhs
-- Tax Slabs (applicable above exemption limit):
+  - Salaried individuals get Rebate up to ₹12.75 Lakhs
+- Tax Slabs (applicable above Rebate limit):
   - Up to ₹4,00,000: No tax (0%)
   - ₹4,00,001 to ₹8,00,000: 5%
   - ₹8,00,001 to ₹12,00,000: 10%
